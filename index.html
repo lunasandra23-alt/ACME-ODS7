@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <!-- PASO 1. El navegador debe utilizar el ancho real del celular. -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ACME | Ahorro de energía en el hogar</title>
+  <link rel="icon" type="image/svg+xml" href="iconos/favicon.svg">
+  <link rel="stylesheet" href="css/estilos.css">
+  <!-- defer espera a que el HTML esté listo antes de ejecutar el JS. -->
+  <script src="js/menu.js" defer></script>
+  <!-- NUEVO: interacción individual (calculadora de ahorro de energía). También usa defer. -->
+  <script src="js/calculadora-ahorro.js" defer></script>
+</head>
+<body>
+  <!-- PASO 2. sticky en CSS mantiene este encabezado visible al bajar. -->
+  <header class="cabecera">
+    <div class="contenedor barra">
+      <!-- Se conserva el logotipo original del archivo proporcionado. -->
+      <a class="marca" href="#inicio" aria-label="ACME, ir al inicio">
+        <img src="iconos/favicon.svg" alt="" width="42" height="42">
+        ACME
+      </a>
+      <!-- PASO 3. El botón controla la navegación cuyo id es navegacion. -->
+      <!-- Un button ya funciona con clic, toque, Enter y espacio. -->
+      <button id="boton-menu" class="hamburguesa" type="button"
+              aria-controls="navegacion" aria-expanded="false" aria-label="Abrir menú">
+        <span class="lineas" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span id="texto-menu">Menú</span>
+      </button>
+      <nav id="navegacion" class="navegacion" aria-label="Navegación principal">
+        <!-- PASO 4. Esta lista es horizontal en escritorio. -->
+        <ul class="menu">
+          <li><a href="#inicio">Inicio</a></li>
+          <li><a href="#nosotros">Nosotros</a></li>
+          <li>
+            <!-- details y summary abren el submenú sin programar otro botón. -->
+            <details id="resolver" class="desplegable">
+              <summary>Resolver</summary>
+              <!-- Esta lista se muestra verticalmente. -->
+              <ul class="submenu">
+                <li><a href="#servicios">Servicios</a></li>
+                <li><a href="#orientador">Ver objetos</a></li>
+                <li><a href="#contacto">Solicitar devolución</a></li>
+              </ul>
+            </details>
+          </li>
+          <li><a href="recursos.html">Video y guía</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+  <main>
+    <section id="inicio" class="hero" tabindex="-1">
+      <div class="contenedor">
+        <h1>Gasta menos luz y devuelve tus artefactos viejos</h1>
+        <p>ACME te muestra cuánta energía pierdes con un artefacto antiguo y cuánto ahorrarías al cambiarlo por uno eficiente.</p>
+        <a class="boton" href="#orientador">Ver objetos</a>
+      </div>
+    </section>
+
+    <section id="nosotros" tabindex="-1">
+      <div class="contenedor texto-ancho">
+        <h2>Nosotros</h2>
+        <p>Queremos que más hogares accedan a una energía asequible y más limpia (ODS 7). Mostramos el ahorro real de cambiar un artefacto y facilitamos la devolución del equipo antiguo para que se recicle y no termine en la basura.</p>
+      </div>
+    </section>
+
+    <section id="servicios" tabindex="-1">
+      <div class="contenedor">
+        <h2>Servicios</h2>
+        <div class="rejilla">
+          <article class="servicio"><h3>Conocer tu consumo</h3><p>Calcula cuánta energía gasta cada artefacto de tu hogar.</p></article>
+          <article class="servicio"><h3>Elegir una opción eficiente</h3><p>Compara con un equivalente que consume menos, incluida la energía solar para calentar agua.</p></article>
+          <article class="servicio"><h3>Devolver el artefacto antiguo</h3><p>Entrega tu equipo viejo para que se recicle de forma segura.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= INICIO DE LA INTERACCIÓN INDIVIDUAL ================= -->
+    <section id="orientador" tabindex="-1">
+      <div class="contenedor">
+        <h2>Ver objetos</h2>
+        <p>Elige un artefacto de tu hogar y cuántas horas lo usas al día. Te mostramos cuánto ahorrarías al cambiarlo.</p>
+
+        <!-- novalidate: las validaciones y mensajes los controla JavaScript. -->
+        <form id="form-ahorro" class="formulario" novalidate>
+          <div class="campo">
+            <label for="artefacto">Artefacto que quieres cambiar</label>
+            <select id="artefacto">
+              <option value="foco">Foco incandescente</option>
+              <option value="tv">Televisor antiguo de plasma</option>
+              <option value="pc">Computadora de escritorio antigua</option>
+              <option value="terma">Terma eléctrica</option>
+            </select>
+          </div>
+          <div class="campo">
+            <label for="horas">Horas de uso al día</label>
+            <input id="horas" type="number" inputmode="decimal" step="0.5" placeholder="Ej.: 5" aria-describedby="error-horas">
+            <p id="error-horas" class="error" role="alert" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="tarifa">Tarifa (S/ por kWh)</label>
+            <input id="tarifa" type="number" inputmode="decimal" step="0.01" value="0.80" aria-describedby="ayuda-tarifa error-tarifa">
+            <p id="ayuda-tarifa" class="ayuda">Valor referencial; usa el de tu recibo de luz.</p>
+            <p id="error-tarifa" class="error" role="alert" hidden></p>
+          </div>
+          <div class="acciones">
+            <button class="boton" type="submit">Calcular ahorro</button>
+            <button id="limpiar-calculo" class="boton boton-secundario" type="button">Limpiar</button>
+          </div>
+        </form>
+
+        <!-- Vista previa del cambio que propone ACME (la escribe JS al elegir el artefacto). -->
+        <p id="cambio-propuesto" class="contador"></p>
+
+        <!-- role="status": el lector de pantalla anuncia cuando aparece el resultado. -->
+        <div role="status" aria-live="polite">
+          <div id="resultado" class="resultado" hidden>
+            <h3>Tu ahorro estimado</h3>
+            <dl class="datos">
+              <div><dt>Consumo actual</dt><dd id="res-actual"></dd></div>
+              <div><dt>Consumo con el equipo eficiente</dt><dd id="res-nuevo"></dd></div>
+              <div><dt>Energía ahorrada al mes</dt><dd id="res-kwh"></dd></div>
+              <div><dt>Dinero ahorrado al mes</dt><dd id="res-mes"></dd></div>
+              <div><dt>Dinero ahorrado al año</dt><dd id="res-anio"></dd></div>
+            </dl>
+            <p id="res-porcentaje"></p>
+            <a class="enlace-card" href="#contacto">Solicitar devolución de mi artefacto antiguo</a>
+          </div>
+        </div>
+        <p class="ayuda">Estimación con potencias referenciales de cada tipo de artefacto y 30 días de uso al mes.</p>
+      </div>
+    </section>
+    <!-- ================== FIN DE LA INTERACCIÓN INDIVIDUAL ================== -->
+
+    <section id="contacto" tabindex="-1">
+      <div class="contenedor texto-ancho">
+        <h2>Solicitar devolución</h2>
+        <p>Cuando cambies tu artefacto, escríbenos a <a href="mailto:devoluciones@acme.example">devoluciones@acme.example</a> con el nombre del equipo antiguo para coordinar su devolución y reciclaje.</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="pie">
+    <div class="contenedor"><p>ACME · Energía asequible para tu hogar (ODS 7)</p></div>
+  </footer>
+</body>
+</html>
